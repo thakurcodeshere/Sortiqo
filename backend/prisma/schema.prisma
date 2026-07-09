@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Category {
+  ORGANIZATION
+  SERVICE
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  accessToken   String
+  refreshToken  String
+  createdAt     DateTime @default(now())
+  
+  senders       Sender[]
+}
+
+model Sender {
+  id              String   @id @default(uuid())
+  userId          String
+  domain          String
+  name            String
+  category        Category
+  emailCount      Int      @default(0)
+  unsubscribeUrl  String?
+  isUnsubscribed  Boolean  @default(false)
+
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, domain])
+}
